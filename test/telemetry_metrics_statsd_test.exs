@@ -297,19 +297,19 @@ defmodule TelemetryMetricsStatsdTest do
       given_counter(
         "http.requests",
         event_name: "http.request",
-        tags: [:env, :host, :method, :status]
+        tags: [:method, :status]
       )
 
     start_reporter(
       metrics: [counter],
       port: port,
-      formatter: :standard,
+      formatter: :datadog,
       global_tags: [env: "dev", host: "localhost"]
     )
 
     :telemetry.execute([:http, :request], %{latency: 172}, %{method: "GET", status: 200})
 
-    assert_reported(socket, "http.requests.dev.localhost.GET.200:1|c")
+    assert_reported(socket, "http.requests:1|c|#env:dev,host:localhost,method:GET,status:200")
   end
 
   test "event metadata overrides global tags with the same keys" do

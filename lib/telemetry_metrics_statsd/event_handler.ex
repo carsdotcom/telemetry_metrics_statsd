@@ -63,7 +63,10 @@ defmodule TelemetryMetricsStatsd.EventHandler do
             |> Map.new()
             |> Map.merge(metric.tag_values.(metadata))
 
-          tags = Enum.map(metric.tags, &{&1, Map.get(tag_values, &1, "")})
+          tags =
+            Keyword.drop(global_tags, metric.tags) ++
+              Enum.map(metric.tags, &{&1, Map.get(tag_values, &1, "")})
+
           Formatter.format(formatter_mod, metric, prefix, value, tags)
         else
           :nopublish
